@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ title or "Trades List (Under Construction)" }} - Trading Journal
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {# The h1 and p elements are part of the content for this specific page #}
+    {# Flashed messages will be displayed above this by base.html #}
+
+    <h1>{{ title or "Trades List" }}</h1>
+    <p class="lead">This page will soon display your logged trades.</p>
+    <hr>
+    <p>The trade you just logged should be saved in the database.</p>
+    <p>
+        <a href="{{ url_for('trades.add_trade') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Log Another Trade
+        </a>
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary ms-2">
+            Back to Dashboard
+        </a>
+    </p>
+</div>
+{% endblock %}

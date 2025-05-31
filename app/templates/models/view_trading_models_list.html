@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title or "Your Trading Models" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>{{ title or "Your Trading Models" }}</h1>
+        <a href="{{ url_for('trading_models.add_trading_model') }}" class="btn btn-success">
+            {# Ensure you have FontAwesome linked in your base.html for icons to appear #}
+            <i class="fas fa-plus-circle"></i> Add New Model
+        </a>
+    </div>
+    <hr>
+
+    {# Display flashed messages if your base.html doesn't already do this in a prominent place #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if models %}
+        <div class="list-group">
+            {% for model in models %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 p-3 shadow-sm border rounded">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ model.name }} {% if model.version %}<span class="text-muted small">(v{{ model.version }})</span>{% endif %}</h5>
+                        <small class="text-muted">
+                            {% if model.updated_at %}
+                                Updated: {{ model.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                                Created: {{ model.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    <p class="mb-2 mt-1">
+                        {% if model.overview_logic %}
+                            {{ model.overview_logic[:200] }}{% if model.overview_logic|length > 200 %}...{% endif %}
+                        {% else %}
+                            <span class="text-muted">No overview provided.</span>
+                        {% endif %}
+                    </p>
+                    <div class="mt-2">
+                        <span class="badge rounded-pill {% if model.is_active %}bg-success{% else %}bg-secondary{% endif %} me-2">
+                            {% if model.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                        <a href="{{ url_for('trading_models.edit_trading_model', model_id=model.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        {# Delete button with confirmation and CSRF token #}
+                        <form method="POST" action="{{ url_for('trading_models.delete_trading_model', model_id=model.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete the trading model \'{{ model.name }}\'? This action cannot be undone.');">
+                            {# This is how you include CSRF token with Flask-WTF/CSRFProtect enabled #}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-3" role="alert">
+            You haven't added any trading models yet. Why not <a href="{{ url_for('trading_models.add_trading_model') }}" class="alert-link">add your first one now</a>?
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

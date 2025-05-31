@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Upload File - App Template{% endblock %}
+{% block header %}Upload File{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Upload a New File</h3>
+        </div>
+        <div class="card-body">
+            {# This form requires 'form' (FileUploadForm instance) to be passed from the route #}
+            {% if form %}
+            <form method="POST" enctype="multipart/form-data" class="upload-form" novalidate>
+                {{ form.hidden_tag() }} {# CSRF token for WTForms #}
+
+                <div class="form-group">
+                    {{ form.file.label(class="form-label") if form.file.label else "<label for='file'>Select File</label>"|safe }}
+                    {{ form.file(class="form-control" + (" is-invalid" if form.file.errors else "")) }}
+                    {% if form.file.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.file.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="form-help">
+                        Allowed types: {{ config.get('ALLOWED_EXTENSIONS', [])|join(', ') }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.description.label(class="form-label") if form.description.label else "<label for='description'>Description (optional)</label>"|safe }}
+                    {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3) }}
+                    {% if form.description.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.is_public %} {# Check if the field exists in the form #}
+                <div class="form-group form-check">
+                    {{ form.is_public(class="form-check-input") }}
+                    {{ form.is_public.label(class="form-check-label") if form.is_public.label else "<label for='is_public'>Make this file visible to other users</label>"|safe }}
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    {{ form.submit(class="btn btn-primary") if form.submit else "<button type='submit' class='btn btn-primary'>Upload</button>"|safe }}
+                    <a href="{{ url_for('files.user_my_files') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            {% else %}
+            <p>Error: Upload form could not be loaded. Please contact support.</p>
+            <p><a href="{{ url_for('files.user_my_files') }}" class="btn btn-secondary">Back to My Files</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

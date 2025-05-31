@@ -1,0 +1,277 @@
+/* General Base Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0; padding: 0; line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--main-bg);
+    padding-top: 56px; /* Height of fixed-top navbar */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+a { color: var(--primary-color); text-decoration: none; }
+a:hover { color: var(--primary-light); }
+
+/* Theme Variables (Ensure these are up-to-date from previous steps) */
+:root, html[data-bs-theme="dark"] { /* Dark Theme */
+    --primary-color: #7f5af0; --primary-light: #9d8bf5; --secondary-color: #2cb67d;
+    --main-bg: #16161a; --content-bg: #242629; --sidebar-bg: #1a1a2e;
+    --text-color: #fffffe; --text-secondary: #94a1b2; --border-color: #43454b; /* etc. */
+    --bs-body-color: var(--text-color); --bs-body-bg: var(--main-bg);
+}
+html[data-bs-theme="light"] { /* Light Theme */
+    --primary-color: #6200ea; --primary-light: #7e3ff2; --secondary-color: #007bff;
+    --main-bg: #f4f6f8; --content-bg: #ffffff; --sidebar-bg: #e9ecef;
+    --text-color: #212529; --text-secondary: #495057; --border-color: #dee2e6; /* etc. */
+    --bs-body-color: var(--text-color); --bs-body-bg: var(--main-bg);
+}
+
+/* Top Navbar Icon */
+.navbar-brand-icon { height: 30px; width: auto; object-fit: contain; }
+.app-body-container { display: flex; flex-grow: 1; position: relative; }
+
+/* --- Sidebar Styles --- */
+.sidebar {
+    width: 75px; /* DEFAULT TO ICON-ONLY WIDTH to prevent flash to 260px */
+    background-color: var(--sidebar-bg);
+    color: var(--text-secondary);
+    display: flex; flex-direction: column;
+    position: fixed; top: 56px; left: 0; height: calc(100vh - 56px);
+    z-index: 1020; border-right: 1px solid var(--border-color);
+    overflow-x: hidden; overflow-y: auto;
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out, opacity 0.1s ease-in-out;
+    transform: translateX(0); /* Visible by default on desktop */
+    opacity: 1; visibility: visible; /* Final state after initialization */
+}
+.sidebar.sidebar-initializing { /* Initially hide to prevent any flash */
+    opacity: 0; visibility: hidden;
+    transition: none !important; /* No transition during init */
+}
+
+/* Desktop: Full Open State (was 'pinned') */
+.sidebar.desktop-full-open {
+    width: 260px;
+}
+.sidebar.desktop-full-open .sidebar-header .app-name, /* If app-name existed in sidebar header */
+.sidebar.desktop-full-open .sidebar-nav .label,
+.sidebar.desktop-full-open .sidebar-nav .arrow,
+.sidebar.desktop-full-open .sidebar-footer {
+    opacity: 1; visibility: visible; width: auto;
+    transition: opacity 0.2s ease-in 0.15s, visibility 0s linear 0.15s, width 0s linear 0.15s;
+}
+.sidebar.desktop-full-open .sidebar-nav li a { justify-content: flex-start; }
+.sidebar.desktop-full-open .sidebar-nav li a .icon { margin-right: 15px; }
+.sidebar.desktop-full-open .sidebar-header .sidebar-avatar-img { /* If icon was in sidebar header */
+    width: 60px; height: 60px; margin-bottom: 10px;
+}
+
+
+/* Desktop: Icon-Only State (this is now the base .sidebar width, so this class mainly hides text) */
+.sidebar.desktop-icon-only .sidebar-header .app-name, /* If app-name existed */
+.sidebar.desktop-icon-only .sidebar-nav .label,
+.sidebar.desktop-icon-only .sidebar-nav .arrow,
+.sidebar.desktop-icon-only .sidebar-footer {
+    opacity: 0; visibility: hidden; width: 0; white-space: nowrap;
+}
+.sidebar.desktop-icon-only .sidebar-nav li a { justify-content: center; }
+.sidebar.desktop-icon-only .sidebar-nav li a .icon { margin-right: 0; }
+.sidebar.desktop-icon-only .sidebar-header { padding: 15px 5px; } /* If header exists */
+.sidebar.desktop-icon-only .sidebar-header .sidebar-avatar-img { /* If icon in sidebar header */
+    width: 40px; height: 40px; margin-bottom: 0;
+}
+
+/* Desktop: Hover to expand icon-only sidebar */
+.sidebar.desktop-icon-only.hover-expanded,
+.sidebar.desktop-icon-only:hover {
+    width: 260px;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.1); z-index: 1025;
+}
+.sidebar.desktop-icon-only.hover-expanded .sidebar-header .app-name,
+.sidebar.desktop-icon-only.hover-expanded .sidebar-nav .label,
+/* ... other elements to show on hover ... */
+.sidebar.desktop-icon-only:hover .sidebar-header .app-name,
+.sidebar.desktop-icon-only:hover .sidebar-nav .label,
+.sidebar.desktop-icon-only:hover .sidebar-nav .arrow,
+.sidebar.desktop-icon-only:hover .sidebar-footer {
+    opacity: 1; visibility: visible; width: auto;
+    transition: opacity 0.2s ease-in 0.15s, visibility 0s linear 0.15s, width 0s linear 0.15s;
+}
+.sidebar.desktop-icon-only.hover-expanded .sidebar-nav li a .icon,
+.sidebar.desktop-icon-only:hover .sidebar-nav li a .icon {
+    margin-right: 15px;
+}
+.sidebar.desktop-icon-only.hover-expanded .sidebar-nav li a,
+.sidebar.desktop-icon-only:hover .sidebar-nav li a {
+    justify-content: flex-start;
+}
+.sidebar.desktop-icon-only.hover-expanded .sidebar-header .sidebar-avatar-img,
+.sidebar.desktop-icon-only:hover .sidebar-header .sidebar-avatar-img {
+    width: 60px; height: 60px; margin-bottom: 10px;
+}
+
+/* Mobile: Overlay States */
+.sidebar.mobile-overlay-closed { transform: translateX(-100%); }
+.sidebar.mobile-overlay-open {
+    transform: translateX(0); top: 56px; height: calc(100vh - 56px);
+    z-index: 1040; box-shadow: 2px 0 10px rgba(0,0,0,0.2); width: 260px;
+}
+.sidebar.mobile-overlay-open .sidebar-nav .label,
+.sidebar.mobile-overlay-open .sidebar-nav .arrow {
+    opacity: 1; visibility: visible; width: auto;
+}
+.sidebar.mobile-overlay-open .sidebar-nav li a .icon { margin-right: 15px; }
+
+/* Sidebar Header (Minimal, as icon/title are in top navbar brand) */
+.sidebar-header { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); min-height: 10px; /* Minimal */
+    position: sticky; top: 0; background-color: var(--sidebar-bg); z-index: 10; }
+
+/* Sidebar Navigation */
+.sidebar-nav { overflow-y: auto; flex-grow: 1; margin-top: 0; padding-top: 0.75rem; }
+/* ... (rest of .sidebar-nav, .submenu, .arrow, .sidebar-footer styles as per your last confirmed good version) ... */
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav li a {
+    display: flex; align-items: center; padding: 10px 20px;
+    color: var(--text-secondary); text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, padding 0.3s ease, justify-content 0.3s ease;
+    border-left: 3px solid transparent; white-space: nowrap; overflow: hidden;
+}
+.sidebar-nav li a:hover, .sidebar-nav li a.active {
+    background-color: var(--content-bg); color: var(--primary-color);
+    border-left-color: var(--primary-color);
+}
+.sidebar-nav li a .icon { margin-right: 15px; width: 20px; text-align: center; font-size: 1.1em; transition: margin-right 0.3s ease; }
+.sidebar-nav li a .label { flex-grow: 1; display: inline; opacity: 1; visibility: visible; }
+
+/* Submenu Styles - CRUCIAL for collapsing */
+.sidebar-nav .submenu {
+    list-style: none; padding-left: 25px; max-height: 0;
+    overflow: hidden; transition: max-height 0.3s ease-in-out;
+    background-color: rgba(0,0,0,0.05);
+}
+html[data-bs-theme="dark"] .sidebar-nav .submenu { background-color: rgba(255,255,255,0.03); }
+.sidebar-nav .submenu.open { max-height: 500px; }
+.sidebar-nav .submenu li a { padding: 8px 20px 8px 15px; font-size: 0.9em; border-left: 3px solid transparent; }
+.sidebar-nav .submenu li a:hover, .sidebar-nav .submenu li a.active {
+    background-color: var(--main-bg); color: var(--primary-light);
+    border-left-color: var(--primary-light);
+}
+.sidebar-nav li a .arrow { margin-left: auto; transition: transform 0.3s ease; }
+.sidebar-nav li a.expanded .arrow { transform: rotate(90deg); }
+
+.sidebar-footer { padding: 15px 20px; text-align: center; margin-top: auto; border-top: 1px solid var(--border-color); white-space: nowrap; overflow: hidden; }
+
+
+/* Main Content Area Adjustments */
+.main-content {
+    flex-grow: 1;
+    transition: margin-left 0.3s ease-in-out;
+    padding: 1rem;
+}
+.main-content.sidebar-desktop-full-open { margin-left: 260px; }
+.main-content.sidebar-desktop-icon-only { margin-left: 75px; } /* Default for desktop */
+.main-content.sidebar-mobile-hidden,
+.main-content.full-width { margin-left: 0; }
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+        top: 56px; height: calc(100vh - 56px);
+        z-index: 1040; box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        /* Reset desktop-specific states for mobile overlay */
+        &.desktop-icon-only, &.desktop-full-open { width: 260px; }
+    }
+    .sidebar.mobile-overlay-open { transform: translateX(0); }
+    .main-content,
+    .main-content.sidebar-desktop-full-open,
+    .main-content.sidebar-desktop-icon-only {
+        margin-left: 0 !important;
+    }
+}
+
+/* General Card Styling */
+.card { background-color: var(--content-bg); border: 1px solid var(--border-color); }
+.card-header { border-bottom: 1px solid var(--border-color); }
+
+/* Add this to your app/static/css/style.css if not already present or incorrect */
+
+/* ... (your existing theme variables and other styles) ... */
+
+/* File List Styles */
+.file-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between file cards */
+    justify-content: flex-start; /* Align cards to the start */
+}
+
+.file-card {
+    width: 180px; /* Adjust card width for desired number of columns, e.g., for medium icons */
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem; /* Bootstrap's default */
+    background-color: var(--content-bg);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensure content fits */
+    margin-bottom: 20px; /* Ensure gap is also applied at bottom if container doesn't wrap perfectly */
+}
+
+.file-preview {
+    width: 100%;
+    height: 120px; /* Fixed height for the preview area - "MEDIUM" icon size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--main-bg); /* A slightly different background for the preview area */
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* This class applied to the <img> tag for image previews */
+.file-preview img.img-preview-medium {
+    max-width: 100%;  /* Ensure image doesn't overflow its container width */
+    max-height: 100%; /* Ensure image doesn't overflow its container height */
+    object-fit: contain; /* Scales down to fit, preserving aspect ratio, no cropping */
+}
+
+/* This class for the <span> holding FontAwesome icons for non-image files */
+.file-preview .file-icon-preview {
+    font-size: 3.5rem; /* Size for FontAwesome icons - "MEDIUM" icon size */
+    color: var(--text-secondary); /* Use a slightly more prominent color */
+}
+
+.file-info {
+    padding: 10px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.file-info .file-name {
+    font-weight: bold;
+    word-break: break-all;
+    margin-bottom: 5px;
+    font-size: 0.85em; /* Slightly smaller for compact cards */
+    color: var(--text-color);
+    line-height: 1.2;
+    max-height: 2.4em; /* Limit to two lines of text */
+    overflow: hidden;
+}
+
+.file-info .file-meta {
+    font-size: 0.75em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.file-actions .btn {
+    margin: 0 2px; /* Small margin between action buttons */
+    padding: 0.25rem 0.5rem; /* Make action buttons smaller */
+    font-size: 0.75rem;
+}
+.file-actions .btn i.fas {
+    font-size: 0.9em; /* Adjust icon size within buttons if needed */
+}
+
+/* ... (your other existing styles) ... */

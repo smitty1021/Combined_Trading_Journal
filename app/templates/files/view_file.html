@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% block title %}View File - {{ file.filename }}{% endblock %}
+
+{% block header %}File Details: {{ file.filename|truncate(50) }}{% endblock %}
+
+{% block content %}
+<div class="file-view-container">
+    <div class="file-view-card">
+        <div class="file-header">
+            <div class="file-title-section">
+                <div class="file-icon-large">
+                    {% if file.file_type in ['jpg', 'jpeg', 'png', 'gif'] %}
+                        <i class="fas fa-file-image"></i>
+                    {% elif file.file_type in ['pdf'] %}
+                        <i class="fas fa-file-pdf"></i>
+                    {% elif file.file_type in ['doc', 'docx'] %}
+                        <i class="fas fa-file-word"></i>
+                    {% elif file.file_type in ['txt'] %}
+                        <i class="fas fa-file-alt"></i>
+                    {% elif file.file_type in ['csv', 'xlsx'] %}
+                        <i class="fas fa-file-excel"></i>
+                    {% else %}
+                        <i class="fas fa-file"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2>{{ file.filename }}</h2>
+                    <div class="file-details">
+                        <span class="file-type">{{ file.file_type.upper() if file.file_type else 'N/A' }}</span>
+                        <span class="file-size">{{ file.filesize|file_size }}</span>
+                        <span class="file-date">Uploaded on {{ file.upload_date|format_date('%B %d, %Y') if file.upload_date else 'N/A' }}</span>
+                        {% if file.is_public %}
+                            <span class="file-visibility"><i class="fas fa-globe-americas"></i> Public</span>
+                        {% else %}
+                            <span class="file-visibility"><i class="fas fa-lock"></i> Private</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="file-actions">
+                <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download
+                </a>
+                {% if file.user_id == current_user.id or current_user.is_admin() %}
+                    <form method="POST" action="{{ url_for('delete_file', file_id=file.id) }}"
+                          onsubmit="return confirm('Are you sure you want to delete this file: \'{{ file.filename }}\'? This action cannot be undone.');" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="file-content-section">
+            {% if file.description %}
+                <div class="file-description-section">
+                    <h3>Description</h3>
+                    <div class="file-description-content">
+                        {{ file.description }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if file.file_type in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <div class="file-preview-section">
+                    <h3>Preview</h3>
+                    <div class="image-preview">
+                        <img src="{{ url_for('download_file', file_id=file.id) }}" alt="Preview of {{ file.filename }}"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-preview\'><i class=\'fas fa-image\'></i><p>Preview not available or image could not be loaded.</p></div>';">
+                    </div>
+                </div>
+            {% elif file.file_type in ['txt'] and file.filesize < 102400 %} {# Limit text preview size #}
+                <div class="file-preview-section">
+                    <h3>Preview (Text)</h3>
+                    <div class="text-preview">
+                        <p>Text preview is not fully implemented. Download the file to view its contents.</p>
+                        {# Example: <pre>{{ file_content_preview }}</pre> #}
+                    </div>
+                </div>
+            {% elif file.file_type in ['pdf'] %}
+                <div class="file-preview-section">
+                    <h3>Preview (PDF)</h3>
+                    <div class="pdf-preview">
+                        <iframe src="{{ url_for('download_file', file_id=file.id) }}#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="500px" type="application/pdf">
+                            <p>Your browser does not support embedded PDFs. Please <a href="{{ url_for('download_file', file_id=file.id) }}">download the PDF</a> to view it.</p>
+                        </iframe>
+                    </div>
+                </div>
+            {% else %}
+                <div class="file-preview-section">
+                    <h3>Preview</h3>
+                    <div class="no-preview">
+                        <i class="fas fa-eye-slash"></i>
+                        <p>Preview not available for this file type. Please download the file to view its contents.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="file-meta-section">
+            <h3>File Information</h3>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Owner</div>
+                    <div class="meta-value">{{ file.user.username if file.user else 'N/A' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Filename</div>
+                    <div class="meta-value">{{ file.filename }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">File Type</div>
+                    <div class="meta-value">{{ file.file_type.upper() if file.file_type else 'N/A' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Size</div>
+                    <div class="meta-value">{{ file.filesize|file_size }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Uploaded On</div>
+                    <div class="meta-value">{{ file.upload_date|format_date('%B %d, %Y at %H:%M') if file.upload_date else 'N/A' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Visibility</div>
+                    <div class="meta-value">{{ 'Public' if file.is_public else 'Private' }}</div>
+                </div>
+                 <div class="meta-item">
+                    <div class="meta-label">MIME Type</div>
+                    <div class="meta-value">{{ file.mime_type or 'N/A' }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Downloads</div>
+                    {# Corrected line: directly access file.download_count #}
+                    <div class="meta-value">{{ file.download_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {# This closes {% block content %} #}
+
+{% block extra_css %}
+<style>
+    .file-view-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .file-view-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+    }
+
+    .file-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .file-title-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-grow: 1; /* Allow title to take space */
+        min-width: 0; /* Prevent overflow issues */
+    }
+
+    .file-icon-large {
+        width: 60px;
+        height: 60px;
+        background-color: var(--background-light);
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0; /* Prevent icon from shrinking */
+    }
+
+    .file-icon-large i {
+        font-size: 30px;
+        color: var(--primary-color);
+    }
+
+    .file-header h2 {
+        margin: 0 0 5px 0;
+        font-size: 1.6rem;
+        color: var(--text-color);
+        word-break: break-all;
+    }
+
+    .file-header .file-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+    .file-header .file-details span {
+        display: inline-block;
+    }
+
+    .file-visibility i {
+        margin-right: 4px;
+    }
+
+    .file-actions {
+        display: flex;
+        gap: 10px;
+        margin-left: 20px;
+        flex-shrink: 0; /* Prevent buttons from shrinking */
+    }
+    .file-actions .btn {
+        white-space: nowrap;
+    }
+
+    .file-content-section,
+    .file-description-section,
+    .file-preview-section,
+    .file-meta-section {
+        margin-bottom: 30px;
+    }
+
+    .file-content-section h3,
+    .file-description-section h3,
+    .file-preview-section h3,
+    .file-meta-section h3 {
+        font-size: 1.3rem;
+        margin-top: 0;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .file-description-content {
+        line-height: 1.6;
+        color: var(--text-secondary);
+        background-color: var(--background-light);
+        padding: 15px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .image-preview {
+        text-align: center;
+        background-color: var(--background-light);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        max-height: 60vh;
+        border-radius: 4px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .text-preview, .pdf-preview {
+        background-color: var(--background-light);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+        min-height: 200px;
+    }
+    .pdf-preview iframe {
+        border: none;
+        width: 100%;
+        height: 500px; /* Ensure iframe has dimensions */
+    }
+
+    .no-preview {
+        background-color: var(--background-light);
+        padding: 40px;
+        border-radius: var(--border-radius);
+        text-align: center;
+        border: 1px solid var(--border-color);
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .no-preview i {
+        font-size: 48px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+    }
+
+    .no-preview p {
+        color: var(--text-muted);
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .meta-item {
+        background-color: var(--background-light);
+        padding: 15px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .meta-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .meta-value {
+        font-weight: 500;
+        color: var(--text-color);
+        word-break: break-word;
+    }
+
+    @media (max-width: 768px) {
+        .file-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+        .file-title-section {
+            gap: 15px;
+        }
+        .file-header h2 {
+            font-size: 1.4rem;
+        }
+        .file-actions {
+            margin-left: 0;
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .file-actions .btn {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .meta-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %} {# This closes {% block extra_css %} #}

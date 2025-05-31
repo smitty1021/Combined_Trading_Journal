@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}File Management - Admin{% endblock %}
+{% block header %}File Management{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <div class="admin-actions">
+        <h2 class="section-title">File Management</h2>
+        <p class="section-description">Manage all uploaded files across the application</p>
+        
+        <div class="action-bar">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="fileSearch" placeholder="Search files...">
+                <button class="search-btn"><span class="icon">🔍</span></button>
+            </div>
+            
+            <div class="filter-controls">
+                <select class="form-control" id="fileTypeFilter">
+                    <option value="">All File Types</option>
+                    <option value="pdf">PDF Documents</option>
+                    <option value="image">Images</option>
+                    <option value="document">Documents</option>
+                    <option value="spreadsheet">Spreadsheets</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <select class="form-control" id="fileSizeFilter">
+                    <option value="">All Sizes</option>
+                    <option value="small">Small (< 1 MB)</option>
+                    <option value="medium">Medium (1-10 MB)</option>
+                    <option value="large">Large (> 10 MB)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ total_files }}</h3>
+                <p class="stat-label">Total Files</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">💾</div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ total_size_display }}</h3>
+                <p class="stat-label">Total Storage</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ unique_users }}</h3>
+                <p class="stat-label">Users with Files</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-content">
+                <h3 class="stat-value">{{ flagged_files }}</h3>
+                <p class="stat-label">Flagged Files</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h3>File Explorer</h3>
+            <div class="header-actions">
+                <button class="btn btn-small" id="bulkDeleteBtn">
+                    <span class="icon">🗑️</span> Delete Selected
+                </button>
+                <button class="btn btn-small" id="bulkDownloadBtn">
+                    <span class="icon">📥</span> Download
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table" id="filesTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllFiles"></th>
+                            <th>Filename</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Uploaded By</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td><input type="checkbox" class="file-select" value="{{ file.id }}"></td>
+                            <td>{{ file.filename }}</td>
+                            <td>
+                                <span class="badge {{ file.type_class }}">{{ file.type }}</span>
+                            </td>
+                            <td>{{ file.size_display }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_edit_user', user_id=file.user.id) }}">
+                                    {{ file.user.name }}
+                                </a>
+                            </td>
+                            <td>{{ file.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-small">
+                                        <span class="icon">📥</span>
+                                    </a>
+                                    <a href="{{ url_for('preview_file', file_id=file.id) }}" class="btn btn-small">
+                                        <span class="icon">👁️</span>
+                                    </a>
+                                    <button class="btn btn-small btn-danger delete-file" data-id="{{ file.id }}">
+                                        <span class="icon">🗑️</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('admin_files', page=pagination.prev_num) }}" class="btn btn-small">&laquo; Previous</a>
+                {% endif %}
+                
+                <span class="pagination-info">
+                    Page {{ pagination.page }} of {{ pagination.pages }}
+                </span>
+                
+                {% if pagination.has_next %}
+                <a href="{{ url_for('admin_files', page=pagination.next_num) }}" class="btn btn-small">Next &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all files checkbox
+        const selectAllCheckbox = document.getElementById('selectAllFiles');
+        const fileCheckboxes = document.querySelectorAll('.file-select');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            fileCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+        
+        // Delete file confirmation
+        const deleteButtons = document.querySelectorAll('.delete-file');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const fileId = this.getAttribute('data-id');
+                
+                if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                    // Send delete request
+                    fetch(`/admin/files/${fileId}/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove row from table
+                            this.closest('tr').remove();
+                            
+                            // Show success message
+                            showFlashMessage('File successfully deleted', 'success');
+                            
+                            // Update stats
+                            updateFileStats();
+                        } else {
+                            showFlashMessage('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showFlashMessage('An error occurred while deleting the file', 'error');
+                    });
+                }
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('fileSearch');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#filesTable tbody tr');
+            
+            rows.forEach(row => {
+                const fileName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const userName = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                
+                if (fileName.includes(searchTerm) || userName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Helper function to show flash messages
+        function showFlashMessage(message, type) {
+            const flashContainer = document.createElement('div');
+            flashContainer.className = `flash-message ${type}`;
+            
+            const messageText = document.createElement('span');
+            messageText.textContent = message;
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'flash-close';
+            closeButton.innerHTML = '&times;';
+            closeButton.addEventListener('click', function() {
+                flashContainer.remove();
+            });
+            
+            flashContainer.appendChild(messageText);
+            flashContainer.appendChild(closeButton);
+            
+            document.querySelector('.flash-messages').appendChild(flashContainer);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                flashContainer.remove();
+            }, 5000);
+        }
+        
+        // Function to update file statistics
+        function updateFileStats() {
+            fetch('/admin/files/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.total_files;
+                document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.total_size_display;
+                document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.unique_users;
+                document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.flagged_files;
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Analytics - App Template{% endblock %}
+{% block page_title %}Analytics Dashboard{% endblock %}
+
+{% block main_content %}
+<div class="analytics-dashboard">
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ active_users }}</div>
+            <div class="stat-label">Active Users</div>
+            <div class="stat-percent">{{ (active_users / total_users * 100)|round|int }}%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ verified_users }}</div>
+            <div class="stat-label">Verified Users</div>
+            <div class="stat-percent">{{ (verified_users / total_users * 100)|round|int }}%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ user_growth_rate }}%</div>
+            <div class="stat-label">Monthly Growth</div>
+            <div class="stat-trend {% if user_growth_rate >= 0 %}positive{% else %}negative{% endif %}">
+                <span class="trend-icon">{% if user_growth_rate >= 0 %}↑{% else %}↓{% endif %}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-row">
+        <div class="dashboard-card large">
+            <div class="card-header">
+                <h3>User Registrations (12 Months)</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="registrationTrendChart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div class="chart-stat-item">
+                        <span class="label">Total:</span>
+                        <span class="value">{{ user_registration_trend.total }}</span>
+                    </div>
+                    <div class="chart-stat-item">
+                        <span class="label">Average/Month:</span>
+                        <span class="value">{{ user_registration_trend.average }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- More dashboard components with charts for login activity and activity types -->
+    <!-- File statistics section -->
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Theme colors
+        const primaryColor = '#e94560';
+        const secondaryColor = 'rgba(233, 69, 96, 0.5)';
+        const gridColor = 'rgba(255, 255, 255, 0.1)';
+        const textColor = '#b0b0b0';
+
+        // Registration Trend Chart
+        const registrationTrendCtx = document.getElementById('registrationTrendChart').getContext('2d');
+        new Chart(registrationTrendCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ user_registration_trend.labels|tojson }},
+                datasets: [{
+                    label: 'New Users',
+                    data: {{ user_registration_trend.values|tojson }},
+                    backgroundColor: secondaryColor,
+                    borderColor: primaryColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: textColor
+                        }
+                    }
+                }
+            }
+        });
+
+        // Additional chart initializations for login activity and activity types
+    });
+</script>
+{% endblock %}

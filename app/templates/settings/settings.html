@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ title or "User Settings" }} - Trading Journal
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-cog me-2"></i>{{ title or "User Settings" }}</h3>
+                </div>
+                <div class="card-body p-4">
+                    {# Display flashed messages #}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message|safe }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                            <hr>
+                        {% endif %}
+                    {% endwith %}
+
+                    {# Theme Settings Section #}
+                    <div class="settings-section mb-4">
+                        <h4>Theme Preference</h4>
+                        <p>Your current theme is: <strong>{{ session.get('theme', 'dark')|title }}</strong></p>
+                        {# Form for changing theme #}
+                        <form method="POST" action="{{ url_for('settings.view_settings') }}" class="mt-2">
+                            {# Correctly embed CSRF token in a hidden input field #}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="form_name" value="change_theme">
+
+                            <button type="submit" name="theme" value="light"
+                                    class="btn theme-option-button {% if session.get('theme', 'dark') == 'light' %}btn-primary active{% else %}btn-outline-secondary{% endif %} me-2">
+                                <i class="fas fa-sun me-1"></i> Light Theme
+                            </button>
+                            <button type="submit" name="theme" value="dark"
+                                    class="btn theme-option-button {% if session.get('theme', 'dark') == 'dark' %}btn-primary active{% else %}btn-outline-secondary{% endif %}">
+                                <i class="fas fa-moon me-1"></i> Dark Theme
+                            </button>
+                        </form>
+                    </div>
+                    <hr>
+
+                    {# Placeholder for Notification Settings #}
+                    <div class="settings-section mb-4">
+                        <h4>Notification Settings <small class="text-muted">(Coming Soon)</small></h4>
+                        <div class="setting-item d-flex justify-content-between align-items-center">
+                            <label for="emailNotifications" class="form-check-label">Email Notifications</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="emailNotifications" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    {# Placeholder for other settings #}
+                    <div class="settings-section">
+                        <h4>Account Preferences <small class="text-muted">(Coming Soon)</small></h4>
+                        <p class="text-muted">Other account preferences will go here.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+// This script ensures the correct theme button appears active if the theme is changed
+// and the page reloads, or if JS is used to toggle theme without page reload (not implemented here).
+document.addEventListener('DOMContentLoaded', function() {
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+    const themeButtons = document.querySelectorAll('.theme-option-button');
+    themeButtons.forEach(button => {
+        if (button.value === currentTheme) {
+            button.classList.add('btn-primary', 'active');
+            button.classList.remove('btn-outline-secondary');
+        } else {
+            button.classList.remove('btn-primary', 'active');
+            button.classList.add('btn-outline-secondary');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Error - {{ error_code }}{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">{{ error_code }}</div>
+    <h1 class="error-title">{{ error_title }}</h1>
+    <p class="error-description">{{ error_description }}</p>
+
+    {% if error_details %}
+    <div class="error-details">
+        <div class="error-details-header">Error Details</div>
+        <div class="error-details-content">
+            {% if error_type %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Type:</span>
+                <span class="error-detail-value">{{ error_type }}</span>
+            </div>
+            {% endif %}
+
+            {% if error_message %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Message:</span>
+                <span class="error-detail-value">{{ error_message }}</span>
+            </div>
+            {% endif %}
+
+            {% if request_path %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Path:</span>
+                <span class="error-detail-value">{{ request_path }}</span>
+            </div>
+            {% endif %}
+
+            {% if request_method %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Method:</span>
+                <span class="error-detail-value">{{ request_method }}</span>
+            </div>
+            {% endif %}
+
+            {% if timestamp %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Time:</span>
+                <span class="error-detail-value">{{ timestamp }}</span>
+            </div>
+            {% endif %}
+
+            {% if error_id %}
+            <div class="error-detail-row">
+                <span class="error-detail-label">Error ID:</span>
+                <span class="error-detail-value">{{ error_id }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="error-actions">
+        <a href="{{ url_for('main.index') }}" class="btn">
+            <span class="icon">🏠</span> Go to Homepage
+        </a>
+
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.index') }}" class="btn">
+            <span class="icon">📊</span> Go to Dashboard
+        </a>
+        {% endif %}
+
+        <button class="btn" onclick="window.history.back()">
+            <span class="icon">↩️</span> Go Back
+        </button>
+    </div>
+
+    {% if support_info %}
+    <div class="support-info">
+        <p>If you need assistance, please contact our support team:</p>
+        <p>
+            <strong>Email:</strong> <a href="mailto:{{ support_email }}">{{ support_email }}</a>
+            {% if support_phone %}
+            <br><strong>Phone:</strong> {{ support_phone }}
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Error page specific styles */
+    .error-container {
+        max-width: 800px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 30px;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+    }
+
+    .error-code {
+        font-size: 7rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+
+    .error-title {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: var(--text-color);
+    }
+
+    .error-description {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+    }
+
+    .error-details {
+        background-color: var(--darker-bg);
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin: 30px 0;
+        text-align: left;
+        border: 1px solid var(--border-color);
+    }
+
+    .error-details-header {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .error-detail-row {
+        margin: 8px 0;
+        display: flex;
+    }
+
+    .error-detail-label {
+        font-weight: 500;
+        width: 100px;
+        color: var(--text-muted);
+    }
+
+    .error-detail-value {
+        flex: 1;
+        word-break: break-word;
+    }
+
+    .error-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+    }
+
+    .support-info {
+        margin-top: 30px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 5rem;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+        }
+
+        .error-container {
+            margin: 20px;
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .error-code {
+            font-size: 4rem;
+        }
+
+        .error-detail-row {
+            flex-direction: column;
+        }
+
+        .error-detail-label {
+            width: 100%;
+            margin-bottom: 3px;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .error-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
