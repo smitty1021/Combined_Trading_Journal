@@ -4,52 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/admin_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/auth_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/files_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/main_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/settings_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/blueprints/trades_bp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/static/images/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/static/profile_pics/default.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/request_password_reset.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/resend_verification_request.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/auth/reset_password_with_token.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/files/my_files.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/files/upload_file.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/files/view_file.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/macros/_form_helpers.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/main/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/models/add_trading_model.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/models/edit_trading_model.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/models/view_trading_models_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/settings/settings.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/trades/view_trades_list_placeholder.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Combined_Trading_Journal.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Combined_Trading_Journal.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/blueprints/trading_models_bp.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/blueprints/trading_models_bp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/admin/create_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin/create_user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/admin/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/admin/edit_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin/edit_user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/admin/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/admin/users.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/email/reset_password_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/email/reset_password_email.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/email/verify_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/email/verify_email.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/errors/error.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/errors/error.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-    </list>
+    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="Initial commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -100,27 +55,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/micha/OneDrive/Desktop/Combined_Trading_Journal/app/templates/email",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/micha/OneDrive/Desktop/Combined_Trading_Journal/app/templates/email&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\templates\email" />
@@ -154,6 +109,7 @@
       <updated>1748661461603</updated>
       <workItem from="1748661462931" duration="7197000" />
       <workItem from="1748704030592" duration="54361000" />
+      <workItem from="1748985514626" duration="466000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -163,7 +119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748662788429</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1748985900545</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1748985900546</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
