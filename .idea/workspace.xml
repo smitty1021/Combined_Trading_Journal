@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="Initial commit" />
+    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="Initial commit">
+      <change afterPath="$PROJECT_DIR$/app/templates/macros/_pagination_helpers.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/trades/add_trade.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/trades/view_trades_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/blueprints/trades_bp.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/blueprints/trades_bp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/macros/_form_helpers.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/macros/_form_helpers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instance/app.db" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -85,11 +96,11 @@
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\static\js" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\templates\trades" />
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\static\images" />
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\static\profile_pics" />
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\templates\auth" />
       <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\templates\files" />
-      <recent name="C:\Users\micha\OneDrive\Desktop\Combined_Trading_Journal\app\templates\main" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -109,7 +120,7 @@
       <updated>1748661461603</updated>
       <workItem from="1748661462931" duration="7197000" />
       <workItem from="1748704030592" duration="54361000" />
-      <workItem from="1748985514626" duration="466000" />
+      <workItem from="1748985514626" duration="14304000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -127,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748985900546</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1748985989881</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1748985989881</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
