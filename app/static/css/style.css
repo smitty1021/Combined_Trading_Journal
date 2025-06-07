@@ -14,7 +14,7 @@ a:hover { color: var(--primary-light); }
 :root, html[data-bs-theme="dark"] { /* Dark Theme */
     --primary-color: #7f5af0; --primary-light: #9d8bf5; --secondary-color: #2cb67d;
     --main-bg: #16161a; --content-bg: #242629; --sidebar-bg: #1a1a2e;
-    --text-color: #fffffe; --text-secondary: #94a1b2; --border-color: #43454b; /* etc. */
+    --text-color: #c3c3c3; --text-secondary: #94a1b2; --border-color: #43454b; /* etc. */
     --bs-body-color: var(--text-color); --bs-body-bg: var(--main-bg);
 }
 html[data-bs-theme="light"] { /* Light Theme */
@@ -191,10 +191,6 @@ html[data-bs-theme="dark"] .sidebar-nav .submenu { background-color: rgba(255,25
 .card { background-color: var(--content-bg); border: 1px solid var(--border-color); }
 .card-header { border-bottom: 1px solid var(--border-color); }
 
-/* Add this to your app/static/css/style.css if not already present or incorrect */
-
-/* ... (your existing theme variables and other styles) ... */
-
 /* File List Styles */
 .file-list-container {
     display: flex;
@@ -274,4 +270,54 @@ html[data-bs-theme="dark"] .sidebar-nav .submenu { background-color: rgba(255,25
     font-size: 0.9em; /* Adjust icon size within buttons if needed */
 }
 
-/* ... (your other existing styles) ... */
+/* ================================== */
+/* Quill.js Rich Text Editor Styling  */
+/* ================================== */
+
+.quill-editor-container {
+    height: 250px;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .25rem;
+}
+
+/* Quill.js Dark Theme Compatibility */
+[data-bs-theme="dark"] .ql-snow .ql-stroke {
+    stroke: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-fill,
+[data-bs-theme="dark"] .ql-snow .ql-picker-label::before {
+    fill: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-picker-label {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-toolbar button:hover .ql-stroke,
+[data-bs-theme="dark"] .ql-snow .ql-toolbar button:hover .ql-fill {
+    stroke: #e9ecef !important;
+    fill: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+[data-bs-theme="dark"] .ql-snow .ql-toolbar button.ql-active .ql-fill {
+    stroke: var(--bs-primary) !important;
+    fill: var(--bs-primary) !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-picker-options {
+    background-color: var(--bs-dark-bg-subtle, #343a40) !important;
+    color: var(--bs-body-color) !important;
+    border-color: var(--bs-border-color) !important;
+}
+
+[data-bs-theme="dark"] .ql-snow .ql-picker-options .ql-picker-item:hover {
+    background-color: var(--bs-primary-bg-subtle, #3b3f44) !important;
+    color: var(--bs-primary) !important;
+}
+
+[data-bs-theme="dark"] .ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.4) !important; /* A semi-transparent white for the placeholder */

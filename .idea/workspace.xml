@@ -4,17 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/app/templates/macros/_pagination_helpers.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/trades/add_trade.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/trades/view_trades_list.html" afterDir="false" />
+    <list default="true" id="3edda1c8-bf9e-479b-b925-4a3d1e6f9cf4" name="Changes" comment="4 Jun 1500">
+      <change afterPath="$PROJECT_DIR$/app/blueprints/journal_bp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/journal/manage_daily_journal.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/macros/_delete_form_macro.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/trades/edit_trade.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/trades/import_trades.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/trades/view_trade_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/blueprints/trades_bp.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/blueprints/trades_bp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/js/script.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/macros/_form_helpers.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/macros/_form_helpers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instance/app.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/trades/add_trade.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/trades/add_trade.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/trades/view_trades_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/trades/view_trades_list.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +126,8 @@
       <updated>1748661461603</updated>
       <workItem from="1748661462931" duration="7197000" />
       <workItem from="1748704030592" duration="54361000" />
-      <workItem from="1748985514626" duration="14304000" />
+      <workItem from="1748985514626" duration="60151000" />
+      <workItem from="1749328245092" duration="1654000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -146,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748985989881</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="4 Jun 1500">
+      <option name="closed" value="true" />
+      <created>1749063727679</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749063727681</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,6 +169,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="4 Jun 1500" />
+    <option name="LAST_COMMIT_MESSAGE" value="4 Jun 1500" />
   </component>
 </project>

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from itsdangerous import URLSafeTimedSerializer
 
 # Import only self-contained utility functions needed for filter registration at module level
-from .utils import format_date_filter, format_filesize  # These should not import 'app' themselves
+from .utils import format_date_filter, format_filesize
 
 # Load environment variables
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
@@ -28,7 +28,6 @@ csrf = CSRFProtect()
 serializer = None
 
 # --- Constants ---
-# ... (Your constants remain here) ...
 MONTH_NAMES = [None, "January", "February", "March", "April", "May", "June",
                "July", "August", "September", "October", "November", "December"]
 QUARTER_NAMES = [None, "Q1 (Jan-Mar)", "Q2 (Apr-Jun)",
@@ -71,9 +70,9 @@ def create_app(config_class=None):
         MAX_CONTENT_LENGTH=int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)),
         ALLOWED_EXTENSIONS=set(
             os.environ.get('ALLOWED_EXTENSIONS', 'pdf,png,jpg,jpeg,doc,docx,xls,xlsx,txt,csv').split(',')),
-        ALLOWED_IMAGE_EXTENSIONS={'png', 'jpg', 'jpeg', 'gif'},
+        ALLOWED_IMAGE_EXTENSIONS={'png', 'jpg', 'jpeg', 'gif'},  # Used by _is_allowed_image helpers
         ITEMS_PER_PAGE=int(os.environ.get('ITEMS_PER_PAGE', 10)),
-        PER_PAGE_TRADES=int(os.environ.get('PER_PAGE_TRADES', 25)),
+        PER_PAGE_TRADES=int(os.environ.get('PER_PAGE_TRADES', 25)),  # Used in trades_bp
         PROFILE_PICS_FOLDER_REL=os.environ.get('PROFILE_PICS_FOLDER_REL', 'profile_pics'),
         PROFILE_PICS_SAVE_PATH=os.path.join(os.path.abspath(os.path.join(app.root_path, 'static')),
                                             os.environ.get('PROFILE_PICS_FOLDER_REL', 'profile_pics')),
@@ -102,8 +101,6 @@ def create_app(config_class=None):
     login_manager.login_message = "Please log in to access this page."
     login_manager.login_message_category = "info"
 
-    # Logging, Upload folder creation (as before)
-    # ... (keep your existing logging and folder creation logic) ...
     log_level = logging.DEBUG if app.debug else logging.INFO
     if not app.logger.handlers:
         log_dir = os.path.join(app.instance_path, 'logs')
@@ -129,34 +126,30 @@ def create_app(config_class=None):
         except OSError as e:
             app.logger.error(f"Could not create PROFILE_PICS_SAVE_PATH: {e}")
 
-    # --- Register Template Filters ---
-    # format_date_filter and format_filesize are imported at the top from .utils
     app.jinja_env.filters['format_date'] = format_date_filter
     app.jinja_env.filters['file_size'] = format_filesize
 
-    # --- Context Processors ---
     @app.context_processor
     def inject_current_year():
         return {'current_year': datetime.utcnow().year}
 
     @app.context_processor
     def inject_theme():
-        theme_to_apply = 'dark'
+        theme_to_apply = 'dark'  # Default theme
         if 'theme' in session:
             theme_to_apply = session['theme']
-        elif flask_login_current_user.is_authenticated:
-            if hasattr(flask_login_current_user, 'settings') and \
-                    flask_login_current_user.settings and \
-                    hasattr(flask_login_current_user.settings, 'theme') and \
-                    flask_login_current_user.settings.theme:
-                theme_to_apply = flask_login_current_user.settings.theme
-                session['theme'] = theme_to_apply
-        if theme_to_apply not in ['light', 'dark']:
+        elif flask_login_current_user.is_authenticated and hasattr(flask_login_current_user, 'settings') and \
+                flask_login_current_user.settings and hasattr(flask_login_current_user.settings, 'theme') and \
+                flask_login_current_user.settings.theme:
+            theme_to_apply = flask_login_current_user.settings.theme
+            session['theme'] = theme_to_apply  # Persist to session for logged-in user
+
+        if theme_to_apply not in ['light', 'dark']:  # Fallback if invalid theme value
             theme_to_apply = 'dark'
         return dict(theme=theme_to_apply)
 
     with app.app_context():
-        from . import models
+        from . import models  # Import models after db is initialized and within app context
 
         @login_manager.user_loader
         def load_user(user_id):
@@ -166,20 +159,22 @@ def create_app(config_class=None):
         from .blueprints.main_bp import main_bp
         app.register_blueprint(main_bp)
         from .blueprints.auth_bp import auth_bp
-        app.register_blueprint(auth_bp)
+        app.register_blueprint(auth_bp, url_prefix='/auth')  # Added prefix for consistency
         from .blueprints.trading_models_bp import trading_models_bp
-        app.register_blueprint(trading_models_bp, url_prefix='/trading_models')
+        app.register_blueprint(trading_models_bp, url_prefix='/trading-models')  # Consistent hyphen
         from .blueprints.files_bp import files_bp
-        app.register_blueprint(files_bp)
+        app.register_blueprint(files_bp, url_prefix='/files')  # Added prefix
         from .blueprints.admin_bp import admin_bp
-        app.register_blueprint(admin_bp)
+        app.register_blueprint(admin_bp, url_prefix='/admin')  # Added prefix
         from .blueprints.trades_bp import trades_bp
-        app.register_blueprint(trades_bp)
+        app.register_blueprint(trades_bp, url_prefix='/trades')  # Added prefix
         from .blueprints.settings_bp import settings_bp
-        app.register_blueprint(settings_bp)
+        app.register_blueprint(settings_bp, url_prefix='/settings')  # Added prefix
 
-        # Error Handlers (as before)
-        # ... (keep your existing error handlers) ...
+        # ADDED: Import and Register Journal Blueprint
+        from .blueprints.journal_bp import journal_bp
+        app.register_blueprint(journal_bp, url_prefix='/journal')
+
         @app.errorhandler(403)
         def forbidden_page(error):
             app.logger.warning(f"403 Forbidden error at {request.path}: {error}")
@@ -193,25 +188,31 @@ def create_app(config_class=None):
         @app.errorhandler(500)
         def server_error_page(error):
             app.logger.error(f"500 Server error at {request.path}: {error}", exc_info=True)
-            db.session.rollback()
+            db.session.rollback()  # Rollback session on server error
             return render_template("errors/500.html", error=error, title="Server Error"), 500
 
-        # Initial Data Setup (as before)
-        # ... (keep your existing initial data setup logic) ...
+        # Initial Data Setup (runs once if tables exist and data is missing)
         if not app.config.get('TESTING', False):
-            is_flask_cli = os.environ.get('FLASK_RUN_FROM_CLI') == 'true' or \
-                           ('args' in dir(request) and request.args and any(
-                               arg in ['db', 'migrate', 'upgrade', 'revision'] for arg in
-                               request.args)) if request else True
+            # Avoid running this during 'flask db' commands before tables are created
+            # The 'is_flask_cli' check might need refinement based on actual CLI args if issues persist during migration
+            is_flask_db_command = False
+            if 'FLASK_RUN_FROM_CLI' in os.environ:  # Check if running via Flask CLI
+                # Check if it's a db command (this is a heuristic)
+                if request and hasattr(request, 'args') and request.args:
+                    if any(arg in ['db', 'migrate', 'upgrade', 'revision'] for arg in request.args):
+                        is_flask_db_command = True
+                elif any(arg in ['db', 'migrate', 'upgrade', 'revision'] for arg in
+                         (os.environ.get('FLASK_COMMAND_ARGS', '').split())):  # Fallback check for CLI args
+                    is_flask_db_command = True
 
-            if not is_flask_cli or app.extensions.get('sqlalchemy'):
+            if not is_flask_db_command:  # Only run if not a db command that precedes table creation
                 try:
                     if models.AccountSetting.query.filter_by(setting_name='current_account_size').first() is None:
                         default_account_size = models.AccountSetting(setting_name='current_account_size',
                                                                      value_str='100000')
                         db.session.add(default_account_size)
                     if models.NewsEventItem.query.count() == 0:
-                        from datetime import time as py_time_init
+                        from datetime import time as py_time_init  # Local import for clarity
                         default_events = [
                             models.NewsEventItem(name="FOMC Statement", default_release_time=py_time_init(14, 0)),
                             models.NewsEventItem(name="CPI", default_release_time=py_time_init(8, 30)),
@@ -220,9 +221,9 @@ def create_app(config_class=None):
                         ]
                         for event in default_events: db.session.add(event)
                     db.session.commit()
-                except Exception as e:
+                except Exception as e:  # Broad exception as tables might not exist during first 'flask run' after 'flask db upgrade'
                     db.session.rollback()
                     app.logger.info(
-                        f"Initial data setup: Could not commit initial data (may be expected if DB not fully migrated): {e}")
+                        f"Initial data setup: Could not commit initial data (this might be expected if tables are not yet fully created or app is initializing for CLI migration command): {e}")
 
     return app

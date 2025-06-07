@@ -1,95 +1,119 @@
 {% extends "base.html" %}
-{% import "macros/_pagination_helpers.html" as pagi %} {# Assuming you might create this for pagination #}
+{% import "macros/_pagination_helpers.html" as pagi %}
+{% import "macros/_form_helpers.html" as forms %}
 
 {% block title %}
     {{ title }} - Combined Trading Journal
 {% endblock %}
 
+{% block head_extra %}
+{{ super() }}
+<style>
+    .grid-layout-filter {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr) auto;
+        gap: 15px;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
+
 {% block page_header %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <h1>{{ title }}</h1>
-        <a href="{{ url_for('trades.add_trade') }}" class="btn btn-success">
-            <i class="fas fa-plus me-1"></i> Log New Trade
-        </a>
+        <div class="d-flex gap-2 mt-2 mt-md-0">
+            <a href="{{ url_for('trades.import_trades') }}" class="btn btn-info"><i class="fas fa-upload me-1"></i> Import</a>
+            <a href="{{ url_for('trades.export_trades_csv', **request.args) }}" class="btn btn-secondary"><i class="fas fa-download me-1"></i> Export</a>
+            <a href="{{ url_for('trades.add_trade') }}" class="btn btn-success"><i class="fas fa-plus me-1"></i> Log New Trade</a>
+        </div>
     </div>
 {% endblock %}
 
 {% block content %}
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Filter Trades</h5></div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('trades.view_trades_list') }}" id="filterForm">
+            <div class="grid-layout-filter">
+                {{ forms.render_field(filter_form.start_date, input_class="form-control form-control-sm", label_visible=true) }}
+                {{ forms.render_field(filter_form.end_date, input_class="form-control form-control-sm", label_visible=true) }}
+                {{ forms.render_field(filter_form.instrument, input_class="form-select form-select-sm", label_visible=true) }}
+                {{ forms.render_field(filter_form.direction, input_class="form-select form-select-sm", label_visible=true) }}
+                {{ forms.render_field(filter_form.trading_model_id, input_class="form-select form-select-sm", label_visible=true) }}
+                {{ forms.render_field(filter_form.tags, input_class="form-select form-select-sm", label_visible=true) }}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-primary" title="Apply Filter"><i class="fas fa-filter"></i></button>
+                    <a href="{{ url_for('trades.view_trades_list') }}" class="btn btn-sm btn-outline-secondary" title="Clear Filters"><i class="fas fa-times"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         {% if trades %}
-        <div class="table-responsive">
-            <table class="table table-hover table-striped">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Instrument</th>
-                        <th>Direction</th>
-                        <th>Entries</th>
-                        <th>Avg. Entry</th>
-                        <th>Exits</th>
-                        <th>Avg. Exit</th>
-                        <th>Gross P&L</th>
-                        <th>R-Value</th>
-                        <th>Model</th>
-                        <th>Tags</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for trade in trades %}
-                    <tr>
-                        <td>{{ trade.trade_date|format_date('%d-%b-%Y') }}</td>
-                        <td>{{ trade.instrument }}</td>
-                        <td>
-                            {% if trade.direction == 'Long' %}
-                                <span class="badge bg-success">{{ trade.direction }}</span>
-                            {% elif trade.direction == 'Short' %}
-                                <span class="badge bg-danger">{{ trade.direction }}</span>
-                            {% else %}
-                                {{ trade.direction }}
-                            {% endif %}
-                        </td>
-                        <td>{{ trade.total_contracts_entered }}</td>
-                        <td>{{ "%.2f"|format(trade.average_entry_price) if trade.average_entry_price is not none else 'N/A' }}</td>
-                        <td>{{ trade.total_contracts_exited }}</td>
-                        <td>{{ "%.2f"|format(trade.average_exit_price) if trade.average_exit_price is not none else 'N/A' }}</td>
-                        <td class="{{ 'text-success' if trade.gross_pnl > 0 else ('text-danger' if trade.gross_pnl < 0 else '') }}">
-                            {{ "$%.2f"|format(trade.gross_pnl) if trade.gross_pnl is not none else '$0.00' }}
-                        </td>
-                        <td>
-                            {% if trade.pnl_in_r is not none %}
-                                <span class="{{ 'text-success' if trade.pnl_in_r > 0 else ('text-danger' if trade.pnl_in_r < 0 else '') }}">
-                                    {{ "%.2f"|format(trade.pnl_in_r) }}R
-                                </span>
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td>{{ trade.trading_model.name if trade.trading_model else 'N/A' }}</td>
-                        <td>
-                            {% if trade.tags %}
-                                {% set tag_list = trade.tags.split(',') %}
-                                {% for tag_item in tag_list %}
-                                    <span class="badge bg-info me-1">{{ tag_item.strip() }}</span>
-                                {% endfor %}
-                            {% else %}
-                            N/A
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="#" class="btn btn-sm btn-info mb-1" title="View Details (Soon)"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-sm btn-warning mb-1" title="Edit (Soon)"><i class="fas fa-edit"></i></a>
-                            <a href="#" class="btn btn-sm btn-danger mb-1" title="Delete (Soon)" onclick="return confirm('Are you sure you want to delete this trade?');"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <form method="POST" action="{{ url_for('trades.bulk_delete_trades') }}" onsubmit="return confirm('Are you sure you want to delete the selected trades?');">
+            {{ csrf_token_for_raw_forms | safe }}
+            <div class="mb-3 d-flex align-items-center">
+                <div class="form-check me-3">
+                    <input class="form-check-input" type="checkbox" id="selectAllTrades">
+                    <label class="form-check-label" for="selectAllTrades">Select All</label>
+                </div>
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash-alt me-1"></i> Delete Selected
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-check-square"></i></th>
+                            <th>Date</th><th>Instrument</th><th>Direction</th><th>P&L</th>
+                            <th>R-Value</th><th>Model</th><th>Tags</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trade in trades %}
+                        <tr>
+                            <td><input class="form-check-input trade-checkbox" type="checkbox" name="trade_ids" value="{{ trade.id }}"></td>
+                            <td>{{ trade.trade_date|format_date('%d-%b-%y') }}</td>
+                            <td>{{ trade.instrument }}</td>
+                            <td>
+                                {% if trade.direction == 'Long' %}<span class="badge bg-success">{{ trade.direction }}</span>
+                                {% elif trade.direction == 'Short' %}<span class="badge bg-danger">{{ trade.direction }}</span>
+                                {% else %}{{ trade.direction }}{% endif %}
+                            </td>
+                            <td class="{{ 'text-success' if trade.gross_pnl > 0 else ('text-danger' if trade.gross_pnl < 0 else '') }}">
+                                {{ "$%.2f"|format(trade.gross_pnl) if trade.gross_pnl is not none else '$0.00' }}
+                            </td>
+                            <td>
+                                {% if trade.pnl_in_r is not none %}<span class="{{ 'text-success' if trade.pnl_in_r > 0 else ('text-danger' if trade.pnl_in_r < 0 else '') }}">{{ "%.2f"|format(trade.pnl_in_r) }}R</span>
+                                {% else %} N/A {% endif %}
+                            </td>
+                            <td>{{ trade.trading_model.name if trade.trading_model else 'N/A' }}</td>
+                            <td>
+                                {% if trade.tags %}<span class="badge bg-secondary">{{ trade.tags }}</span>
+                                {% else %} N/A {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('trades.view_trade_detail', trade_id=trade.id) }}" class="btn btn-sm btn-info mb-1" title="View Details"><i class="fas fa-eye"></i></a>
+                                <a href="{{ url_for('trades.edit_trade', trade_id=trade.id) }}" class="btn btn-sm btn-warning mb-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                <form action="{{ url_for('trades.delete_trade', trade_id=trade.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this trade?');">
+                                    {{ csrf_token_for_raw_forms | safe }}
+                                    <button type="submit" class="btn btn-sm btn-danger mb-1" title="Delete"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
         {% else %}
         <div class="alert alert-info">
-            No trades logged yet. <a href="{{ url_for('trades.add_trade') }}" class="alert-link">Log your first trade!</a>
+            No trades found.
         </div>
         {% endif %}
     </div>
@@ -98,8 +122,31 @@
 {# Pagination #}
 {% if pagination and pagination.pages > 1 %}
 <div class="mt-4">
-    {{ pagi.render_pagination(pagination, 'trades.view_trades_list') }}
+    {{ pagi.render_pagination(pagination, 'trades.view_trades_list', **request.args) }}
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts_extra %}
+{{ super() }}
+<script>
+// "Select All" checkbox logic
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('selectAllTrades');
+    const bulkForm = document.getElementById('bulkActionForm');
+    if (selectAllCheckbox && bulkForm) {
+        const tradeCheckboxes = bulkForm.querySelectorAll('.trade-checkbox');
+        selectAllCheckbox.addEventListener('change', function() {
+            tradeCheckboxes.forEach(checkbox => {
+                // To associate checkboxes with the bulk form, we can't have them inside the table if table is outside form
+                // But since table is now OUTSIDE the form, we need to handle this differently.
+                // For simplicity, I've moved the form to wrap the table again in this corrected version.
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+});
+</script>
+{# This is where the missing {% endblock %} was. It's now correctly placed at the very end of the file. #}
 {% endblock %}

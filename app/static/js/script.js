@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainContent = document.querySelector('.main-content');
     const menuToggle = document.getElementById('menuToggle'); // Hamburger in top navbar
     const themeToggleSwitch = document.getElementById('theme-toggle-switch');
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
 
     // --- Theme Handling (Keep as is from your last working version) ---
     const defaultTheme = 'dark';

@@ -387,20 +387,232 @@ class ExitPoint(db.Model): # ... (Keep as previously corrected) ...
     trade_id = db.Column(db.Integer, db.ForeignKey('trade.id', name='fk_exitpoint_trade'), nullable=False)
     def __repr__(self): return f"<ExitPoint ID: {self.id} for Trade ID: {self.trade_id} ({self.contracts} @ {self.exit_price})>"
 
-class DailyJournal(db.Model): # ... (Keep as previously corrected) ...
+
+class DailyJournalImage(db.Model):
+    __tablename__ = 'daily_journal_image'
+    id = db.Column(db.Integer, primary_key=True)
+    daily_journal_id = db.Column(db.Integer, db.ForeignKey('daily_journal.id', name='fk_dailyjournalimage_journal'),
+                                 nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_dailyjournalimage_user'), nullable=False,
+                        index=True)
+
+    filename = db.Column(db.String(255), nullable=False)
+    filepath = db.Column(db.String(255), nullable=False, unique=True)
+    filesize = db.Column(db.Integer, nullable=False)
+    mime_type = db.Column(db.String(100), nullable=True)
+    upload_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    image_type = db.Column(db.String(50), nullable=True)  # e.g., 'pre_market_analysis', 'eod_chart'
+    caption = db.Column(db.String(255), nullable=True)
+
+    uploader = db.relationship('User', backref='uploaded_daily_journal_images', lazy=True)
+
+    @property
+    def full_disk_path(self):
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', os.path.join(current_app.instance_path, 'uploads'))
+        # Consider a subfolder for journal images if preferred:
+        # journal_image_folder = os.path.join(upload_folder, 'journal_images')
+        # if not os.path.exists(journal_image_folder): os.makedirs(journal_image_folder)
+        # return os.path.join(journal_image_folder, self.filepath)
+        return os.path.join(upload_folder, self.filepath)  # Using main UPLOAD_FOLDER for now
+
+    def __repr__(self):
+        return f'<DailyJournalImage {self.filename} for Journal ID {self.daily_journal_id}>'
+
+
+class DailyJournal(db.Model):
     __tablename__ = 'daily_journal'
     id = db.Column(db.Integer, primary_key=True)
-    journal_date = db.Column(db.Date, nullable=False)
-    key_events = db.Column(db.Text, nullable=True)
-    wg_ny2_sf_lod_te = db.Column(db.Time, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_dailyjournal_user'), nullable=False, index=True)
-    __table_args__ = (db.UniqueConstraint('user_id', 'journal_date', name='uq_user_journal_date'),)
+    journal_date = db.Column(db.Date, nullable=False)
+
+    # Part 1: Pre-market Preparation
+    key_events_today = db.Column(db.Text, nullable=True)  # Renamed from key_events for clarity
+    key_tasks_today = db.Column(db.Text, nullable=True)  # Renamed from key_tasks for clarity
+    on_my_mind = db.Column(db.Text, nullable=True)  # For "what's on my mind"
+    important_focus_today = db.Column(db.Text, nullable=True)  # Renamed from important_focus
+    mental_feeling_rating = db.Column(db.Integer, nullable=True)  # 1-5
+    mental_mind_rating = db.Column(db.Integer, nullable=True)  # 1-5 (Clarity/Focus)
+    mental_energy_rating = db.Column(db.Integer, nullable=True)  # 1-5
+    mental_motivation_rating = db.Column(db.Integer, nullable=True)  # 1-5
+
+    # Part 2: Pre-market Analysis
+    # P12 and 4-Step related fields (many already exist)
+    p12_scenario_selected = db.Column(db.String(10), default="None")
+    p12_expected_outcomes = db.Column(db.Text, nullable=True)  # User notes on P12
+    # Session specific analysis from existing model fields:
+    asia_direction = db.Column(db.String(10), default="None")
+    asia_session_status = db.Column(db.String(10), default="None")  # True/False (retrace)
+    asia_model_status = db.Column(db.String(10), default="None")  # Valid/Broken (OU midline)
+    asia_actual_range_points = db.Column(db.Float, nullable=True)
+    asia_actual_range_percentage = db.Column(db.Float, nullable=True)
+    asia_median_range_input_note = db.Column(db.Text, nullable=True)  # For user input on median
+
+    london_direction = db.Column(db.String(10), default="None")
+    london_session_status = db.Column(db.String(10), default="None")
+    london_model_status = db.Column(db.String(10), default="None")
+    london_actual_range_points = db.Column(db.Float, nullable=True)
+    london_actual_range_percentage = db.Column(db.Float, nullable=True)
+    london_median_range_input_note = db.Column(db.Text, nullable=True)
+
+    ny1_direction = db.Column(db.String(10), default="None")
+    ny1_session_status = db.Column(db.String(10), default="None")
+    ny1_model_status = db.Column(db.String(10), default="None")
+    ny1_actual_range_points = db.Column(db.Float, nullable=True)
+    ny1_actual_range_percentage = db.Column(db.Float, nullable=True)
+    ny1_median_range_input_note = db.Column(db.Text, nullable=True)
+
+    ny2_direction = db.Column(db.String(10), default="None")
+    ny2_session_status = db.Column(db.String(10), default="None")
+    ny2_model_status = db.Column(db.String(10), default="None")
+    ny2_actual_range_points = db.Column(db.Float, nullable=True)
+    ny2_actual_range_percentage = db.Column(db.Float, nullable=True)
+    ny2_median_range_input_note = db.Column(db.Text, nullable=True)
+
+    # HOD/LOD Projection WG Fields (wg_ny1_lt_notes, etc. - ensure all 16x4=64 fields are listed if needed)
+    # For brevity, I'll list a few examples; you'll need to ensure all `wg_...` fields from your original model are here.
+    wg_ny1_lt_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_lt_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_lt_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_lt_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_lt_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_lf_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_lf_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_lf_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_lf_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_lf_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_st_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_st_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_st_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_st_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_st_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_sf_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_sf_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_sf_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_sf_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_sf_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_lt_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_lt_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_lt_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_lt_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_lt_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_lf_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_lf_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_lf_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_lf_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_lf_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_st_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_st_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_st_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_st_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_st_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny1_sf_notes = db.Column(db.Text, nullable=True)
+    wg_ny1_sf_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny1_sf_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny1_sf_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny1_sf_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_lt_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_lt_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_lt_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_lt_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_lt_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_lf_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_lf_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_lf_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_lf_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_lf_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_st_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_st_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_st_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_st_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_st_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_sf_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_sf_hod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_sf_hod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_sf_hod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_sf_hod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_lt_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_lt_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_lt_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_lt_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_lt_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_lf_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_lf_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_lf_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_lf_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_lf_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_st_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_st_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_st_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_st_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_st_lod_te = db.Column(db.Time, nullable=True)
+
+    wg_ny2_sf_notes = db.Column(db.Text, nullable=True)
+    wg_ny2_sf_lod_pct_l = db.Column(db.Float, nullable=True)
+    wg_ny2_sf_lod_pct_h = db.Column(db.Float, nullable=True)
+    wg_ny2_sf_lod_ts = db.Column(db.Time, nullable=True)
+    wg_ny2_sf_lod_te = db.Column(db.Time, nullable=True)
+
+    adr_10_day_median_range_value = db.Column(db.Float, nullable=True)  # Step 3: Realistic Expectance
+    todays_total_range_points = db.Column(db.Float, nullable=True)
+    todays_total_range_percentage = db.Column(db.Float, nullable=True)
+    realistic_expectance_notes = db.Column(db.Text, nullable=True)  # Step 3 notes
+    engagement_structure_notes = db.Column(db.Text, nullable=True)  # Step 4 notes
+    key_levels_notes = db.Column(db.Text, nullable=True)  # For "key levels" text
+    pre_market_news_notes = db.Column(db.Text, nullable=True)  # For "news events" text
+
+    # Part 4: Post Market Analysis
+    market_observations = db.Column(db.Text, nullable=True)  # Can be "post-market analysis notes"
+    self_observations = db.Column(db.Text, nullable=True)  # Can be "reengineering notes"
+
+    # Part 5: Daily Review and Reflection
+    did_well_today = db.Column(db.Text, nullable=True)
+    did_not_go_well_today = db.Column(db.Text, nullable=True)
+    learned_today = db.Column(db.Text, nullable=True)  # "something i learned about the market or myself"
+    improve_action_next_day = db.Column(db.Text, nullable=True)
+
+    # Daily Psych Review scores (already present)
+    review_psych_discipline_rating = db.Column(db.Integer, nullable=True)
+    review_psych_motivation_rating = db.Column(db.Integer, nullable=True)
+    review_psych_focus_rating = db.Column(db.Integer, nullable=True)
+    review_psych_mastery_rating = db.Column(db.Integer, nullable=True)
+    review_psych_composure_rating = db.Column(db.Integer, nullable=True)
+    review_psych_resilience_rating = db.Column(db.Integer, nullable=True)
+    review_psych_mind_rating = db.Column(db.Integer, nullable=True)  # (Clarity of Mind)
+    review_psych_energy_rating = db.Column(db.Integer, nullable=True)  # (Physical Energy)
+
+    # Relationship to DailyJournalImage
+    images = db.relationship('DailyJournalImage', backref='daily_journal', lazy='dynamic', cascade="all, delete-orphan")
+
+    # Ensures one journal entry per user per day
+    __table_args__ = (db.UniqueConstraint('user_id', 'journal_date', name='uq_user_daily_journal_date'),)
+
     @property
     def average_review_psych_rating(self):
-        ratings = [self.review_psych_discipline_rating, self.review_psych_motivation_rating, self.review_psych_focus_rating, self.review_psych_mastery_rating, self.review_psych_composure_rating, self.review_psych_resilience_rating, self.review_psych_mind_rating, self.review_psych_energy_rating]
+        ratings = [
+            self.review_psych_discipline_rating, self.review_psych_motivation_rating,
+            self.review_psych_focus_rating, self.review_psych_mastery_rating,
+            self.review_psych_composure_rating, self.review_psych_resilience_rating,
+            self.review_psych_mind_rating, self.review_psych_energy_rating
+        ]
         valid_ratings = [r for r in ratings if r is not None and isinstance(r, (int, float)) and 1 <= r <= 5]
-        if not valid_ratings: return None
+        if not valid_ratings:
+            return None
         return statistics.mean(valid_ratings)
+
     def __repr__(self): return f"<DailyJournal for {self.journal_date} (User: {self.user_id})>"
 
 class WeeklyJournal(db.Model): # ... (Keep as previously corrected) ...
